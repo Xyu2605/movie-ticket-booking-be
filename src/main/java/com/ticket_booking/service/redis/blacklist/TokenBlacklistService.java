@@ -6,7 +6,7 @@ import java.util.Date;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.ticket_booking.config.redis.RedisKey;
+import com.ticket_booking.enums.RedisKey;
 import com.ticket_booking.service.jwt.JwtService;
 
 import io.jsonwebtoken.Claims;

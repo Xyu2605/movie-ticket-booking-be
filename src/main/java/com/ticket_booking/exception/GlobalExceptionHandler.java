@@ -40,13 +40,19 @@ public class GlobalExceptionHandler {
         
         return responseFactory.response(errorCode, errors);
     }
-    
+
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ApiResponseFormat<Object>> handleUserLoginNotFound(UsernameNotFoundException ex){
         
         ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
         log.warn("User not found: {}", ex.getMessage());
         return responseFactory.response(errorCode, ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponseFormat<Object>> handleGeneric(Exception ex) {
+        log.error("Unexpected error", ex);
+        return responseFactory.response(ErrorCode.INTERNAL_SERVER_ERROR, null);
     }
 
 }

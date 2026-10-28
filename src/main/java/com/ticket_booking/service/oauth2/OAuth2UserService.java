@@ -31,13 +31,14 @@ public class OAuth2UserService extends DefaultOAuth2UserService{
             return processOAuth2User(userRequest, oAuth2User);
 
         } catch (OAuth2AuthenticationException ex){
+            
             log.error("Error processing OAuth2 user: ", ex);
             
             OAuth2Error error = new OAuth2Error(
                 "oauth2_user_processing_failed",
                 "Unable to process OAuth2 user",
                 null
-        )   ;
+            );
 
             throw new OAuth2AuthenticationException(error, ex);
         }

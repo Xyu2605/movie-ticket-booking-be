@@ -1,4 +1,4 @@
-package com.ticket_booking.config.redis;
+package com.ticket_booking.enums;
 
 
 public final class RedisKey {

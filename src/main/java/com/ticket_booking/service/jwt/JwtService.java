@@ -26,13 +26,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j 
 public class JwtService implements IJwtService{
     
-    @Value("${jwt.secret}")
+    @Value("${spring.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration}")
+    @Value("${spring.jwt.expiration}")
     private Long expiration;
 
-    @Value("${jwt.refresh-expiration}")
+    @Value("${spring.jwt.refresh-expiration}")
     private Long refreshExpiration;
     
     private String generateToken(UserDetails userDetails, Long expiration){

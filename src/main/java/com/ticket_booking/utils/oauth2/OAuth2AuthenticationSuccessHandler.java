@@ -29,6 +29,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     
     @Value("${spring.security.oauth2.redirect-url}")
     private String redirectUri;
+    
 
     @Override 
     public void onAuthenticationSuccess(HttpServletRequest request, 

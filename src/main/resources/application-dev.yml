@@ -1,0 +1,79 @@
+server:
+  port: 8686
+
+spring:
+  application:
+    name: ticket_booking
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: 
+        format_sql: true
+
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG
+      org.hibernate.orm.jdbc.bind: TRACE
+      org.hibernate: WARN
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${SPRING_REDIS_PASSWORD}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          goggle:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - profile
+              - email
+            redirect-uri: "{baseUrl}/"
+
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION}
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+  minio:
+    url: ${MINIO_URL}
+    public-url: ${MINIO_PUBLIC_URL}
+    access-key: ${MINIO_ACCESS_KEY}
+    secret-key: ${MINIO_SECRET_KEY}
+    bucket-name: ${MINIO_BUCKET_NAME}
+
+  servlet:
+    multipart:
+      max-file-size: 10MB       # Max size for a single PDF
+      max-request-size: 50MB   # Max size for the entire batch request
+app:
+  ratelimit:
+    rules:
+      login:
+        capacity: 10
+        refill-token: 5
+        refill-period-seconds: 30
+      booking:
+        capacity: 10
+        refill-token: 5
+        refill-period-seconds: 2
+      default:
+        capacity: 80
+        refill-token: 10
+        refill-period-seconds: 1
+        
+          
+      

@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public enum SuccessCode implements ApiResponseCode{
     
-    OK(true,"S0001", "success.ok", HttpStatus.OK);
+    OK(true,"SC0001", "success.ok", HttpStatus.OK);
 
     private final boolean success;
     private final String code;

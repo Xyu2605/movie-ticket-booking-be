@@ -1,41 +1,16 @@
 package com.ticket_booking.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-/**
- * A standardized, generic wrapper for all API responses.
- *
- * @param data      The response payload.
- * @param timestamp The server timestamp in UTC milliseconds when the response was generated.
- * @param <T>       The type of the data payload.
- */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public record ApiResponseFormat<T>(
-        long timestamp,
-        boolean success,
-        String code,
-        String message,
-        T data
-) {
-    /**
-     * Represents structured error information.
-     *
-     * @param code    A machine-readable error code (e.g., "VALIDATION_ERROR").
-     * @param message A human-readable error message.
-     * @param details Optional list of specific validation errors or other details.
-     */
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    public record ApiError<E>(
-//            String code,
-//            String message,
-//            E details
-//    ) {}
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record ApiData<E>(
-            boolean success,
-            String code,
-            String message,
-            E details
-    ) {}
+@Getter
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL) // ẩn field null khi serialize
+public class ApiResponseFormat<T> {
+    private final long timestamp;
+    private final boolean success;
+    private final String code;
+    private final String message;
+    private final T data;
 }
