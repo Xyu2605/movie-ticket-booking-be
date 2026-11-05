@@ -1,19 +1,21 @@
 package com.ticket_booking.dto;
 
-import java.security.AuthProvider;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
+import com.ticket_booking.enums.AuthProvider;
+
 public record UserDto(
     UUID id,
-    String firstName,
-    String lastName,
+    String fullName,
     String email,
     AuthProvider authProvider,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt,
-    Collection<String> roles
+    String profilePicture,
+    String role,
+    Instant createdAt,
+    Instant updatedAt
 ) {
 
 }

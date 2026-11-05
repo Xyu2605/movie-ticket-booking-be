@@ -55,14 +55,14 @@ public class OAuth2UserService extends DefaultOAuth2UserService{
         log.info("Processing OAuth2 user: {} from provider: {}", email, registrationId);
 
         User user = userRepository.findByEmail(email)
-                    .orElseGet(()->{
+                    .orElseGet(()-> {
                         User newUser = new User();
                         newUser.setEmail(email);
                         newUser.setFullName(name);
                         newUser.setProfilePicture(picture);
                         newUser.setAuthProvider(AuthProvider.GOOGLE);
                         newUser.setProviderId(providerId);
-                        newUser.setIsActive(true);
+                        newUser.setActive(true);
 
                         return userRepository.save(newUser);
                     });

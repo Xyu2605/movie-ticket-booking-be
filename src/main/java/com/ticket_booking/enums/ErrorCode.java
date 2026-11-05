@@ -20,6 +20,8 @@ public enum ErrorCode implements ApiResponseCode {
     VALIDATION_ERROR(false, "ERR008", "Dữ liệu không hợp lệ", HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND(false, "ERR009", "Không tìm thấy người dùng", HttpStatus.NOT_FOUND),
     TOO_MANY_REQUEST(false,"ERR010", "Quá nhiều yêu cầu", HttpStatus.TOO_MANY_REQUESTS),
+    USER_ALREADY_EXISTED(false, "ERR011", "Người dùng email này đã tồn tại", HttpStatus.CONFLICT),
+    USER_BANNED(false, "ERR012", "Tài khoản đã bị vô hiệu hóa", HttpStatus.FORBIDDEN)
     ;
 
     private final boolean success;

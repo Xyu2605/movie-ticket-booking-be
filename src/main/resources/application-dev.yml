@@ -24,12 +24,13 @@ spring:
       org.hibernate.SQL: DEBUG
       org.hibernate.orm.jdbc.bind: TRACE
       org.hibernate: WARN
-
+      
   data:
     redis:
-      host: localhost
-      port: 6379
-      password: ${SPRING_REDIS_PASSWORD}
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2s
 
   security:
     oauth2:
