@@ -36,6 +36,12 @@ public interface UserRepository extends JpaRepository<User, UUID>{
     boolean existsByEmail(@Param("email") String email);
 
 
-    
-    
+    @EntityGraph(attributePaths = "role")
+    Optional<User> findById(UUID id);
+
+
+    @Query("""
+                
+    """)
+    int updateUserPassword(UUID id, String newPassword);
 }

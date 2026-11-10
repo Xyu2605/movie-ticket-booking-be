@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ticket_booking.security.user.CustomUserDetailsService;
-import com.ticket_booking.service.jwt.JwtService;
-import com.ticket_booking.service.redis.blacklist.TokenBlacklistService;
+import com.ticket_booking.service.jwt.JwtServiceImpl;
+import com.ticket_booking.service.redis.blacklist.TokenBlacklistServiceImpl;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -28,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthenticationFilter extends OncePerRequestFilter{
     
     private final CustomUserDetailsService customUserDetailsService;
-    private final TokenBlacklistService tokenBlacklistService;
-    private final JwtService jwtService;
+    private final TokenBlacklistServiceImpl tokenBlacklistService;
+    private final JwtServiceImpl jwtService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

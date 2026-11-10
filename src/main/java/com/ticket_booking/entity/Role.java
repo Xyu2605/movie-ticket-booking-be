@@ -1,5 +1,8 @@
 package com.ticket_booking.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.ticket_booking.enums.RoleType;
 
 import jakarta.persistence.*;
@@ -34,4 +37,22 @@ public class Role {
     @Column(name = "name", nullable = false, length = 50)
     @EqualsAndHashCode.Include
     private String name;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "role_permissions",
+        joinColumns = @JoinColumn(name = "role_id"),
+        inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private Set<Permission> permissions = new HashSet<>();
+
+    public void addPermission(Permission permission){
+        this.permissions.add(permission);
+        permission.getRoles().add(this);
+    }
+
+    public void removePermission(Permission permission){
+        this.permissions.remove(permission);
+        permission.getRoles().remove(this);
+    }
 }

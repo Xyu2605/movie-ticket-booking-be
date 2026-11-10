@@ -12,9 +12,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service 
 @RequiredArgsConstructor 
+@Slf4j
 public class RedisServiceImpl<K, F, V> implements RedisService<K, F, V>{
 
     private final RedisTemplate<K, V> redisTemplate;

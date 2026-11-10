@@ -32,6 +32,5 @@ public interface RedisService<K, F, V> {
     void delete(K key, F fields);
 
     void delete(K key, List<F> fields);
-
     
 }

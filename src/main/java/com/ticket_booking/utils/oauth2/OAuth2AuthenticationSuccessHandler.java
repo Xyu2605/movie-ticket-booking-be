@@ -11,7 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ticket_booking.entity.User;
 import com.ticket_booking.security.user.CustomUserDetailsService;
-import com.ticket_booking.service.jwt.JwtService;
+import com.ticket_booking.service.jwt.JwtServiceImpl;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor 
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
     
-    private final JwtService jwtService;
+    private final JwtServiceImpl jwtService;
     private final CustomUserDetailsService customUserDetailsService;
     
     @Value("${spring.security.oauth2.redirect-url}")

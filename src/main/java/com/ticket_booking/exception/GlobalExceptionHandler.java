@@ -13,7 +13,6 @@ import com.ticket_booking.dto.response.ApiResponseFormat;
 import com.ticket_booking.enums.ErrorCode;
 import com.ticket_booking.utils.ResponseFactory;
 
-import io.minio.messages.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,12 +53,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseFormat<Object>> handleGeneric(Exception ex) {
         log.error("Unexpected error", ex);
         return responseFactory.response(ErrorCode.INTERNAL_SERVER_ERROR, null);
-    }
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponseFormat<Object>> handleNotFound(ResourceNotFoundException ex) {
-        log.error("Not found: {}", ex.getMessage());
-        return responseFactory.response(ErrorCode.RESOURCE_NOT_FOUND, ex.getMessage());
     }
 
 }
