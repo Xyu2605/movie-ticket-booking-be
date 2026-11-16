@@ -42,6 +42,6 @@ CREATE TABLE users (
         CHECK (auth_provider = 'LOCAL' OR provider_id IS NOT NULL)
 );
 
--- Index cho query thường gặp
-CREATE INDEX idx_users_email ON users(email);           -- có thể bỏ, UNIQUE đã tạo index
+-- Index cho query
+CREATE UNIQUE INDEX uk_users_email_lower ON users (LOWER(email));-- có thể bỏ, UNIQUE đã tạo index
 CREATE INDEX idx_users_provider ON users(auth_provider, provider_id);  -- có thể bỏ, UNIQUE đã tạo

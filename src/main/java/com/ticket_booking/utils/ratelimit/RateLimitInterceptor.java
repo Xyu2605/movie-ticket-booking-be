@@ -1,11 +1,15 @@
 package com.ticket_booking.utils.ratelimit;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.time.Duration;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import com.ticket_booking.enums.RateLimitPolicy;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.BucketConfiguration;
@@ -32,7 +36,7 @@ public class RateLimitInterceptor implements HandlerInterceptor{
         RateLimitProperties.Rule rule = rateLimitProperties.getRule().get(policyName);
         String clientKey = resolveClientKey(request);
 
-        byte[] bucketKey = (policyName + ":" + clientKey).getBytes();
+        byte[] bucketKey = (policyName + ":" + clientKey).getBytes(StandardCharsets.UTF_8);
 
         BucketConfiguration bucketConfiguration = buildConfiguration(rule);
 
@@ -68,23 +72,20 @@ public class RateLimitInterceptor implements HandlerInterceptor{
     private String resolvepolicyName(String path){
         
         if(path.startsWith(API_PREFIX + "/auth/login")){
-            return "login";
+            return RateLimitPolicy.LOGIN.getName();
         }
 
         if(path.startsWith(API_PREFIX + "/booking") || path.startsWith(API_PREFIX + "/payment")){
-            return "booking";
+            return RateLimitPolicy.BOOKING.getName();
         }
         
-        return "default";
+        return RateLimitPolicy.DEFAULT.getName();
     }
 
     private String resolveClientKey(HttpServletRequest request){
         
-        String userId = Optional.ofNullable(request.getUserPrincipal()).map(p -> p.getName()).orElse(null);
-        if(userId != null){
-            return "user: " + userId + " | ip: " + request.getRemoteAddr();
-        }
-        
-        return "ip: " + request.getRemoteAddr();
+        String userId =  Optional.ofNullable(request.getUserPrincipal()).map(Principal::getName)
+                            .orElse(null);
+        return userId != null ? "user: " + userId : "ip: " + request.getRemoteAddr();
     }
 }

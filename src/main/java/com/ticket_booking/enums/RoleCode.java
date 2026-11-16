@@ -1,6 +1,6 @@
 package com.ticket_booking.enums;
 
-public enum RoleType {
+public enum RoleCode {
     USER,
     ADMIN,
     STAFF

@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.ticket_booking.enums.AuthProvider;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -69,6 +71,9 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserSecurity userSecurity;
+
     @Column(name = "profile_picture", length = 255)
     private String profilePicture;
 
@@ -95,5 +100,21 @@ public class User {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    public void setUserSecurity(UserSecurity userSecurity) {
+        this.userSecurity = userSecurity;
+
+        if (userSecurity != null && userSecurity.getUser() != this) {
+            userSecurity.setUser(this);
+        }
+    }
+
+    public void removeUserSecurity() {
+        if (this.userSecurity != null) {
+            UserSecurity security = this.userSecurity;
+            this.userSecurity = null;
+            security.setUser(null);
+        }
     }
 }

@@ -1,106 +1,208 @@
-server:
-  port: 8686
+x-common: &common
+  restart: unless-stopped
+  networks:
+    - app-network
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "10m"
+      max-file: "3"
 
-spring:
-  application:
-    name: ticket_booking
+x-healthcheck-postgres: &healthcheck-postgres
+  test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+  start_period: 30s
 
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
+x-healthcheck-redis: &healthcheck-redis
+  test: ["CMD-SHELL", "redis-cli -a ${SPRING_REDIS_PASSWORD} ping | grep PONG"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+  start_period: 10s
 
-  jpa:
-    hibernate:
-      ddl-auto: update        # dev only — prod: validate + Flyway
-    open-in-view: false
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
+services:
 
-  data:
-    redis:
-      host: ${SPRING_REDIS_HOST:localhost}
-      port: ${SPRING_REDIS_PORT:6379}
-      password: ${SPRING_REDIS_PASSWORD:}
+  postgres:
+    <<: *common
+    image: postgres:17-alpine
+    container_name: movie-ticket-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck: *healthcheck-postgres
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          memory: 512M
+    networks:
+      - app-internal 
 
-  security:
-    oauth2:
-      client:
-        registration:
-          google:             
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
-            scope:
-              - openid
-              - profile
-              - email
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 50MB
-
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
-    org.hibernate: WARN
-
-app:
-  jwt:
-    secret: ${JWT_SECRET}
-    expiration-ms: ${JWT_EXPIRATION_MS:900000}                 
-    refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}  
-
+  redis:
+    <<: *common
+    image: redis:7-alpine
+    container_name: movie-ticket-redis
+    command: >
+      redis-server
+      --requirepass ${SPRING_REDIS_PASSWORD}
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck: *healthcheck-redis
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768M
+    networks:
+      - app-internal
   minio:
-    url: ${MINIO_URL}
-    public-url: ${MINIO_PUBLIC_URL}
-    access-key: ${MINIO_ACCESS_KEY}
-    secret-key: ${MINIO_SECRET_KEY}
-    bucket-name: ${MINIO_BUCKET_NAME}
+    <<: *common
+    image: minio/minio:latest
+    container_name: movie-ticket-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+    networks:
+      - app-internal
+  backend:
+    <<: *common
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime             
+    image: movie-ticket-backend:${APP_VERSION:-latest}
+    container_name: movie-ticket-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_REDIS_PASSWORD: ${SPRING_REDIS_PASSWORD}
+      MINIO_URL: http://minio:9000
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-http://localhost:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      JAVA_OPTS: >-
+        -XX:MaxRAMPercentage=75.0
+        -XX:+UseG1GC
+        -XX:+HeapDumpOnOutOfMemoryError
+    ports:
+      - "8686:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy     
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s                
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          memory: 512M
+    networks:
+      - app-network                    # ← cả internal + external
 
-  ratelimit:
-    rules:
-      login:
-        capacity: 20
-        refill-token: 10
-        refill-period-seconds: 60
-      login-user:
-        capacity: 5
-        refill-token: 3
-        refill-period-seconds: 60
-      login-pair:
-        capacity: 3
-        refill-token: 2
-        refill-period-seconds: 60
-      oauth-init:
-        capacity: 30
-        refill-token: 15
-        refill-period-seconds: 30
-      oauth-callback:
-        capacity: 30
-        refill-token: 15
-        refill-period-seconds: 30
-      refresh:
-        capacity: 10
-        refill-token: 5
-        refill-period-seconds: 60
-      booking:
-        capacity: 10
-        refill-token: 5
-        refill-period-seconds: 2
-      upload:
-        capacity: 5
-        refill-token: 2
-        refill-period-seconds: 60
-      default:
-        capacity: 80
-        refill-token: 10
-        refill-period-seconds: 1
+  nginx:
+    <<: *common
+    image: nginx:1.27-alpine
+    container_name: movie-ticket-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - nginx_logs:/var/log/nginx
+      # - ./nginx/ssl:/etc/nginx/ssl:ro       # bật khi có SSL
+    depends_on:
+      backend:
+        condition: service_healthy     
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    networks:
+      - app-network
+
+  # frontend:
+  #   <<: *common
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: movie-ticket-frontend
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     backend:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+  nginx_logs:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
+  app-internal:
+    driver: bridge
+    internal: true   

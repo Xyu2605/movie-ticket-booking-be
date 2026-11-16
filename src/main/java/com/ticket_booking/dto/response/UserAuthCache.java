@@ -3,7 +3,7 @@ package com.ticket_booking.dto.response;
 import java.util.UUID;
 
 import com.ticket_booking.enums.AuthProvider;
-import com.ticket_booking.enums.RoleType;
+import com.ticket_booking.enums.RoleCode;
 
 public record UserAuthCache(
     UUID id,
@@ -12,7 +12,7 @@ public record UserAuthCache(
     AuthProvider authProvider,
     String providerId,
     boolean isActive,
-    RoleType roleType 
+    RoleCode roleType 
 ) {
     
 }

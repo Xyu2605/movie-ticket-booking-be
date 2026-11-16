@@ -3,7 +3,7 @@ package com.ticket_booking.entity;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ticket_booking.enums.RoleType;
+import com.ticket_booking.enums.RoleCode;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,7 +32,7 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 50)
-    private RoleType type;
+    private RoleCode code;
 
     @Column(name = "name", nullable = false, length = 50)
     @EqualsAndHashCode.Include

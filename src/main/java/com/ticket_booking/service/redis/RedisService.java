@@ -26,11 +26,15 @@ public interface RedisService<K, F, V> {
     List<V> hashGetByFieldPrefix(K key, String fieldPrefix);
 
     Set<F> getFieldPrefixes(K key);
-    
+
     void delete(K key);
 
     void delete(K key, F fields);
 
     void delete(K key, List<F> fields);
+
+    void expire(K key, Duration time);
+    
+    Long increment(K key);
     
 }

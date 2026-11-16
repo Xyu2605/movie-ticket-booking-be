@@ -1,4 +1,4 @@
-package com.ticket_booking.service.redis.blacklist;
+package com.ticket_booking.service.redis.tokenblacklist;
 
 public interface TokenBlacklistService {
 

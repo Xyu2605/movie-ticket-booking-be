@@ -1,13 +1,10 @@
 package com.ticket_booking.service.user;
 
-import java.io.StringReader;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.checkerframework.checker.units.qual.K;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +24,7 @@ import com.ticket_booking.entity.User;
 import com.ticket_booking.enums.AuthProvider;
 import com.ticket_booking.enums.ErrorCode;
 import com.ticket_booking.enums.RedisKey;
-import com.ticket_booking.enums.RoleType;
+import com.ticket_booking.enums.RoleCode;
 import com.ticket_booking.enums.UserState;
 import com.ticket_booking.exception.ApiException;
 import com.ticket_booking.mapper.UserMapper;
@@ -245,10 +242,9 @@ public class UserServiceImpl implements UserService{
         );
     }
 
-
     private UserDto createNewUser(CreateUserRequest request){
         log.info("Create new user for email: {}", request.email());
-        Role defaultRole = roleRepository.findByType(RoleType.USER)
+        Role defaultRole = roleRepository.findByType(RoleCode.USER)
                             .orElseThrow(() -> new ApiException( ErrorCode.RESOURCE_NOT_FOUND,"Default role User not found. Please run role seeder!"));
         
         String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
@@ -260,7 +256,7 @@ public class UserServiceImpl implements UserService{
         newUser.setAuthProvider(AuthProvider.LOCAL);
         newUser.setRole(defaultRole);
         newUser.setActive(true);
-
+        
         User savedUser = userRepository.save(newUser);
         log.info("Created new user {} with role {}", savedUser.getId(), defaultRole.getName());
 

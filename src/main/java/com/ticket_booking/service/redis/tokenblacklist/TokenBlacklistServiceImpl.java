@@ -1,4 +1,4 @@
-package com.ticket_booking.service.redis.blacklist;
+package com.ticket_booking.service.redis.tokenblacklist;
 
 import java.time.Duration;
 import java.util.Date;
@@ -30,7 +30,7 @@ public class TokenBlacklistServiceImpl implements TokenBlacklistService{
             log.debug("Token already expired, skip blacklist");
             return;   // token hết hạn rồi thì không cần blacklist
         }
-
+        
         redisTemplate.opsForValue().set(
                 RedisKey.BLACKLIST_PREFIX + token,
                 "blacklisted",

@@ -11,7 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ticket_booking.security.user.CustomUserDetailsService;
 import com.ticket_booking.service.jwt.JwtServiceImpl;
-import com.ticket_booking.service.redis.blacklist.TokenBlacklistServiceImpl;
+import com.ticket_booking.service.redis.tokenblacklist.TokenBlacklistServiceImpl;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

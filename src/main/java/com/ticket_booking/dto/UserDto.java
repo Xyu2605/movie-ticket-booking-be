@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import com.ticket_booking.enums.AuthProvider;
-import com.ticket_booking.enums.RoleType;
+import com.ticket_booking.enums.RoleCode;
 
 public record UserDto(
     UUID id,
@@ -14,7 +14,7 @@ public record UserDto(
     String email,
     AuthProvider authProvider,
     String profilePicture,
-    RoleType roleType,
+    RoleCode roleType,
     Boolean isActive,
     Instant createdAt,
     Instant updatedAt

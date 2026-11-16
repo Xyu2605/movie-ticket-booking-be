@@ -39,7 +39,7 @@ public class RedisConfiguration {
 
         return redisTemplate;
     }
-
+    
     @Bean
     <K, F, V>HashOperations<K, F, V> hashOperations(
             RedisTemplate<K, V> redisTemplate) {

@@ -62,7 +62,7 @@ public class RedisServiceImpl<K, F, V> implements RedisService<K, F, V>{
         return hashOperations.get(key, field);
     }
 
-    @Override
+    @Override 
     public List<V> hashGetByFieldPrefix(K key, String fieldPrefix) {
         List<V> objects = new ArrayList<>();
 
@@ -96,5 +96,17 @@ public class RedisServiceImpl<K, F, V> implements RedisService<K, F, V>{
         for (F field : fields) {
             hashOperations.delete(key, field);
         }
+    }
+
+    @Override
+    public Long increment(K key){
+        Long count = redisTemplate.opsForValue().increment(key);
+
+        return count;
+    }
+
+    @Override
+    public void expire(K key, Duration time){
+        redisTemplate.expire(key, time);
     }
 }

@@ -32,8 +32,9 @@ public enum ErrorCode implements ApiResponseCode {
     INVALID_CREDENTIALS(false, "AUTH_001", "Email hoặc mật khẩu không đúng", HttpStatus.UNAUTHORIZED),
     TOKEN_EXPIRED(false, "AUTH_002", "Token đã hết hạn", HttpStatus.UNAUTHORIZED),
     TOKEN_INVALID(false, "AUTH_003", "Token không hợp lệ", HttpStatus.UNAUTHORIZED),
+    TO_MANY_LOGIN_REQUEST_ATTEMPTS(false, "AUTH_004", "Quá nhiều yêu cầu đăng nhập", HttpStatus.TOO_MANY_REQUESTS)
     ;
-
+    
     private final boolean success;
     private final String code;
     private final String message;

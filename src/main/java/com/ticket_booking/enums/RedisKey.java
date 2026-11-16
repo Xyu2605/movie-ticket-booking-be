@@ -10,4 +10,9 @@ public final class RedisKey {
     //User
     public static final String USER_BY_ID = "user:id:";
     public static final String USER_BY_EMAIL = "user:email:";
+
+    // login
+
+    public static final String LOGIN_FAIL_EMAIL = "login-fail:email:";
+    public static final String LOGIN_FAIL_IP = "login-fail:ip";
 }
