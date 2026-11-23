@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
+    
     LoginResult login(LoginRequest request);
     LoginResponse loginWithGoogle(OAuth2User oauth2User);
     

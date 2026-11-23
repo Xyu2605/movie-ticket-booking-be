@@ -65,6 +65,12 @@ app:
     access-key: ${MINIO_ACCESS_KEY}
     secret-key: ${MINIO_SECRET_KEY}
     bucket-name: ${MINIO_BUCKET_NAME}
+  
+  security:
+    login:
+      max-failures: 5
+      failure-window-seconds: 300
+      lock-duration-seconds: 900
 
   ratelimit:
     rules:

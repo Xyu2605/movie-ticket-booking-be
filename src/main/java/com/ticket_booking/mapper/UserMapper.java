@@ -38,4 +38,6 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)     
     @Mapping(target = "updatedAt", ignore = true)      
     User userAuthCacheToUser(UserAuthCache cache);
+
+    
 }

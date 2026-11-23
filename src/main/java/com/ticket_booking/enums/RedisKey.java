@@ -15,4 +15,7 @@ public final class RedisKey {
 
     public static final String LOGIN_FAIL_EMAIL = "login-fail:email:";
     public static final String LOGIN_FAIL_IP = "login-fail:ip";
+
+    // user security
+    public static final String USER_SECURITY_BY_ID = "user-security:id:";
 }
