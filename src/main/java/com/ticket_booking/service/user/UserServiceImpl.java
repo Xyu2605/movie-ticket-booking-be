@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,7 @@ import com.ticket_booking.dto.request.UpdateUserNameRequest;
 import com.ticket_booking.dto.request.UpdateUserPasswordRequest;
 import com.ticket_booking.entity.Role;
 import com.ticket_booking.entity.User;
+import com.ticket_booking.entity.UserSecurity;
 import com.ticket_booking.enums.AuthProvider;
 import com.ticket_booking.enums.ErrorCode;
 import com.ticket_booking.enums.RedisKey;
@@ -30,6 +32,7 @@ import com.ticket_booking.exception.ApiException;
 import com.ticket_booking.mapper.UserMapper;
 import com.ticket_booking.repository.RoleRepository;
 import com.ticket_booking.repository.UserRepository;
+import com.ticket_booking.repository.UserSecurityRepository;
 import com.ticket_booking.service.jwt.JwtServiceImpl;
 import com.ticket_booking.service.redis.RedisService;
 import com.ticket_booking.utils.ratelimit.RateLimitInterceptor;
@@ -50,6 +53,7 @@ public class UserServiceImpl implements UserService{
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final UserSecurityRepository userSecurityRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -241,7 +245,7 @@ public class UserServiceImpl implements UserService{
             }
         );
     }
-
+    // 2 email cos the den cung 1 luc @_@
     private UserDto createNewUser(CreateUserRequest request){
         log.info("Create new user for email: {}", request.email());
         Role defaultRole = roleRepository.findByType(RoleCode.USER)
@@ -250,6 +254,8 @@ public class UserServiceImpl implements UserService{
         String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
         
         User newUser = new User();
+        UUID userId = UUID.randomUUID();
+        newUser.setId(userId);
         newUser.setFullName(request.fullName());
         newUser.setEmail(normalizedEmail);
         newUser.setPassword(passwordEncoder.encode(request.password()));
@@ -257,10 +263,15 @@ public class UserServiceImpl implements UserService{
         newUser.setRole(defaultRole);
         newUser.setActive(true);
         
-        User savedUser = userRepository.save(newUser);
-        log.info("Created new user {} with role {}", savedUser.getId(), defaultRole.getName());
-
-        return userMapper.toDto(savedUser);
+        UserSecurity security = new UserSecurity();
+        newUser.setUserSecurity(security);
+        
+        try{
+            User savedUser = userRepository.saveAndFlush(newUser);
+            return userMapper.toDto(savedUser);
+        }catch(DataIntegrityViolationException e){
+            throw new ApiException(ErrorCode.USER_ALREADY_EXISTED);
+        }
     }
     
     private void setCacheUserDtoByEmail(String email, UserDto userDto){

@@ -1,48 +1,63 @@
+
 package com.ticket_booking.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Configuration 
+@Configuration
 public class RedisConfiguration {
-    
+
     @Value("${spring.data.redis.port}")
-    private String redisPort;
+    private int redisPort;
 
     @Value("${spring.data.redis.host}")
     private String redisHost;
 
     @Bean
-    JedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(redisHost);
-        redisStandaloneConfiguration.setPort(Integer.parseInt(redisPort));
+    public LettuceConnectionFactory redisConnectionFactory() {
+        RedisStandaloneConfiguration config =
+                new RedisStandaloneConfiguration();
 
-        return new JedisConnectionFactory(redisStandaloneConfiguration);
+        config.setHostName(redisHost);
+        config.setPort(redisPort);
+
+        return new LettuceConnectionFactory(config);
     }
 
     @Bean
-    <K, V>RedisTemplate<K, V> redisTemplate() {
-        RedisTemplate<K, V> redisTemplate = new RedisTemplate<>();
+    public <K, V> RedisTemplate<K, V> redisTemplate(
+            LettuceConnectionFactory redisConnectionFactory) {
 
-        redisTemplate.setConnectionFactory(jedisConnectionFactory());
-        redisTemplate.setKeySerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setHashKeySerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        RedisTemplate<K, V> template = new RedisTemplate<>();
 
-        return redisTemplate;
+        template.setConnectionFactory(redisConnectionFactory);
+
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+
+        template.setValueSerializer(
+                new GenericJackson2JsonRedisSerializer());
+
+        template.setHashValueSerializer(
+                new GenericJackson2JsonRedisSerializer());
+
+        template.afterPropertiesSet();
+
+        return template;
     }
-    
+
     @Bean
-    <K, F, V>HashOperations<K, F, V> hashOperations(
+    public <K, F, V> HashOperations<K, F, V> hashOperations(
             RedisTemplate<K, V> redisTemplate) {
+
         return redisTemplate.opsForHash();
     }
 }

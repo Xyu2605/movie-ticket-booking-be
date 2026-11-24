@@ -18,4 +18,5 @@ public final class RedisKey {
 
     // user security
     public static final String USER_SECURITY_BY_ID = "user-security:id:";
+    public static final String RECORD_LOGIN_FAILURES = "record_login_failures:";
 }

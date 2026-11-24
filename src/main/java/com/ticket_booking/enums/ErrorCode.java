@@ -27,6 +27,7 @@ public enum ErrorCode implements ApiResponseCode {
     USER_ALREADY_EXISTED(false, "USER_002", "Người dùng này đã tồn tại", HttpStatus.CONFLICT),
     USER_BANNED(false, "USER_003", "Tài khoản đã bị vô hiệu hóa", HttpStatus.FORBIDDEN),
     USER_DELETED(false, "USER_OO4", "Tài khoản đã bị xóa", HttpStatus.FORBIDDEN),
+    ACCOUNT_LOCKED(false, "USER_005", "Tài khoản đang bị tạm khóa", HttpStatus.BAD_REQUEST),
 
     // Auth
     INVALID_CREDENTIALS(false, "AUTH_001", "Email hoặc mật khẩu không đúng", HttpStatus.UNAUTHORIZED),

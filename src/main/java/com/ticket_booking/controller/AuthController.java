@@ -16,6 +16,7 @@ import com.ticket_booking.service.cookie.CookieService;
 import com.ticket_booking.service.user.UserService;
 import com.ticket_booking.utils.ResponseFactory;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +31,8 @@ public class AuthController {
     private final ResponseFactory responseFactory;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponseFormat<LoginResponse>> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response){
-        LoginResult result = authService.login(request);
+    public ResponseEntity<ApiResponseFormat<LoginResponse>> login(@Valid @RequestBody LoginRequest request,HttpServletRequest httpServletRequest, HttpServletResponse response){
+        LoginResult result = authService.login(request, httpServletRequest);
 
         cookieService.setRefreshTokenCookie(response, result.refreshToken());
 

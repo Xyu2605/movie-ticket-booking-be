@@ -15,12 +15,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
     
-    LoginResult login(LoginRequest request);
-    LoginResponse loginWithGoogle(OAuth2User oauth2User);
+    LoginResult login(LoginRequest request, HttpServletRequest httpServletRequest);
+    // LoginResponse loginWithGoogle(OAuth2User oauth2User);
     
-    RegisterResponse register(CreateUserRequest request, HttpServletResponse response);
+    // RegisterResponse register(CreateUserRequest request, HttpServletResponse response);
 
-    String getNewAccessToken(String refreshToken);
+    // String getNewAccessToken(String refreshToken);
     
-    void logout(HttpServletRequest request, HttpServletResponse response);
+    // void logout(HttpServletRequest request, HttpServletResponse response);
 }

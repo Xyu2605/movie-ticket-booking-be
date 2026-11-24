@@ -39,9 +39,4 @@ public interface UserRepository extends JpaRepository<User, UUID>{
     @EntityGraph(attributePaths = "role")
     Optional<User> findById(UUID id);
 
-
-    @Query("""
-                
-    """)
-    int updateUserPassword(UUID id, String newPassword);
 }

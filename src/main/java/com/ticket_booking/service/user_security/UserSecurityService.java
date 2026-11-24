@@ -8,11 +8,11 @@ import com.ticket_booking.entity.UserSecurity;
 public interface UserSecurityService {
 
     UserSecurity getUserSecurity(UUID userId);
-    
     UserSecurityDto getUserSecurityDto(UUID userId);
-    boolean isLocked(UUID userId);
-    long getRemainingLockMinutes(UUID userId);
+    // boolean isLocked(UUID userId);
+    // long getRemainingLockMinutes(UUID userId);
     
-    void recordLoginFailure(UUID userId, String ip);
-    void unlock(UUID userId);
+    void assertNotLocked(UUID userId);
+    void recordLoginFailures(UUID userId, String ip);
+    void resetLoginFailures(UUID userId);
 }
