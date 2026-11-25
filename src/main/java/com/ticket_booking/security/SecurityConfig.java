@@ -72,7 +72,7 @@ public class SecurityConfig {
     }
 
     @Bean 
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, DaoAuthenticationProvider authenticationProvider) throws Exception{
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
@@ -80,7 +80,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(
                 auth -> auth.requestMatchers(
-                "api/v1/auth/**"
+                "/api/v1/auth/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

@@ -23,9 +23,7 @@ public class RedisConfiguration {
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration config =
-                new RedisStandaloneConfiguration();
-
+        RedisStandaloneConfiguration config =new RedisStandaloneConfiguration();
         config.setHostName(redisHost);
         config.setPort(redisPort);
 
@@ -33,31 +31,22 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public <K, V> RedisTemplate<K, V> redisTemplate(
-            LettuceConnectionFactory redisConnectionFactory) {
+    public <K, V> RedisTemplate<K, V> redisTemplate(LettuceConnectionFactory redisConnectionFactory) {
 
         RedisTemplate<K, V> template = new RedisTemplate<>();
 
         template.setConnectionFactory(redisConnectionFactory);
-
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
-
-        template.setValueSerializer(
-                new GenericJackson2JsonRedisSerializer());
-
-        template.setHashValueSerializer(
-                new GenericJackson2JsonRedisSerializer());
-
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.afterPropertiesSet();
 
         return template;
     }
 
     @Bean
-    public <K, F, V> HashOperations<K, F, V> hashOperations(
-            RedisTemplate<K, V> redisTemplate) {
-
+    public <K, F, V> HashOperations<K, F, V> hashOperations(RedisTemplate<K, V> redisTemplate) {
         return redisTemplate.opsForHash();
     }
 }

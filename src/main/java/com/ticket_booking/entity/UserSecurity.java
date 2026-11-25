@@ -45,7 +45,7 @@ public class UserSecurity {
     private User user;
 
     @Column(name = "failed_attempts", nullable = false)
-    private Integer failedAttempts = 0;
+    private Integer failedAttempts;
 
     @Column(name = "window_started_at")
     private Instant windowStartedAt;

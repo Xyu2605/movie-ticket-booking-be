@@ -7,11 +7,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.ticket_booking.utils.ratelimit.RateLimitInterceptor;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer{
     
-    @Autowired
-    private RateLimitInterceptor rateLimitInterceptor;
+    private final RateLimitInterceptor rateLimitInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry){

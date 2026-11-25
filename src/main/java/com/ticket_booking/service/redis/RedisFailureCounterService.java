@@ -25,13 +25,13 @@ public class RedisFailureCounterService {
     private final StringRedisTemplate redisTemplate;
     private final RedisScript<List<Long>> recordFailureScript;
 
-    @Value("${app.security.login}")
+    @Value("${app.security.login.max-failures}")
     private int maxFailures;
 
-    @Value("${app.security.failure-window-seconds}")
+    @Value("${app.security.login.failure-window-seconds}")
     private int failureWindowSeconds;
 
-    @Value("${app.security.lock-duration-seconds}")
+    @Value("${app.security.login.lock-duration-seconds}")
     private int lockDurationSeconds;
 
     public FailureResult recordFailure(UUID userId){

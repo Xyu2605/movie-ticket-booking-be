@@ -14,7 +14,7 @@ public record UserDto(
     String email,
     AuthProvider authProvider,
     String profilePicture,
-    RoleCode roleType,
+    RoleCode roleCode,
     Boolean isActive,
     Instant createdAt,
     Instant updatedAt

@@ -21,17 +21,17 @@ spring:
       port: 6379
   security:
     oauth2:
+      redirect-url: ${OAUTH2_REDIRECT_URL:http://localhost:3000}
       client:
         registration:
-          goggle:
+          google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
             scope:
-              - profile
               - email
-            redirect-uri: "{baseUrl}/"
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION}
-          
+              - profile
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION}
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION}    
       

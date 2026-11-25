@@ -15,7 +15,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticket_booking.dto.UserDto;
 import com.ticket_booking.dto.request.CreateUserRequest;
 import com.ticket_booking.dto.request.UpdateUserNameRequest;
@@ -39,6 +38,7 @@ import com.ticket_booking.utils.ratelimit.RateLimitInterceptor;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.ObjectMapper;
 
 @Service 
 @RequiredArgsConstructor 
@@ -248,7 +248,7 @@ public class UserServiceImpl implements UserService{
     // 2 email cos the den cung 1 luc @_@
     private UserDto createNewUser(CreateUserRequest request){
         log.info("Create new user for email: {}", request.email());
-        Role defaultRole = roleRepository.findByType(RoleCode.USER)
+        Role defaultRole = roleRepository.findByCode(RoleCode.USER)
                             .orElseThrow(() -> new ApiException( ErrorCode.RESOURCE_NOT_FOUND,"Default role User not found. Please run role seeder!"));
         
         String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
@@ -333,7 +333,7 @@ public class UserServiceImpl implements UserService{
             UserDto userDto = objectMapper.readValue(cachedUser, UserDto.class);
             log.debug("[Cache HIT] {}", cacheKey);
             return Optional.of(userDto);
-        } catch(JsonProcessingException e){
+        } catch(Exception e){
             // Dữ liệu hỏng hoặc đổi schema: xóa để lần sau ghi lại đúng
             log.warn("[Cache Error] Corrupt entry, evicting. key={}, error={}", cacheKey, e.getMessage());
             safeDeleteKey(cacheKey);

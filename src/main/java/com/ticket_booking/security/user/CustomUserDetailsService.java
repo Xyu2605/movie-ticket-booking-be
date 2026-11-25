@@ -1,8 +1,9 @@
 package com.ticket_booking.security.user;
 
+import java.util.Optional;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.ticket_booking.entity.User;
@@ -19,8 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService{
     @Override
     public UserDetails loadUserByUsername(String email){
         
-        User user = userRepository.findByEmail(email)
-                    .orElseThrow(()-> new UsernameNotFoundException("User not found"));
-        return CustomUserDetails.buildUserDetails(user);
+        Optional<User> user = userRepository.findByEmail(email);
+        return CustomUserDetails.buildUserDetails(user.get());
     }
 }

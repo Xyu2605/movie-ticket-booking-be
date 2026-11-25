@@ -1,5 +1,5 @@
-package com.ticket_booking.mapper;
 
+package com.ticket_booking.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,10 +14,12 @@ import com.ticket_booking.entity.UserSecurity;
     unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public interface UserSecurityMapper {
-    
-    @Mapping(target ="user", ignore = true)
+
+    // UserSecurity.user không có trong DTO.
+    // userId được MapStruct tự động ánh xạ.
     UserSecurityDto toDto(UserSecurity userSecurity);
 
+    // Không ánh xạ quan hệ User trực tiếp.
     @Mapping(target = "user", ignore = true)
     UserSecurity toEntity(UserSecurityDto dto);
 }

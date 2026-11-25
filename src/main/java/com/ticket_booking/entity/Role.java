@@ -31,7 +31,7 @@ public class Role {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, length = 50)
+    @Column(name = "code", nullable = false, length = 50, unique = true)
     private RoleCode code;
 
     @Column(name = "name", nullable = false, length = 50)
