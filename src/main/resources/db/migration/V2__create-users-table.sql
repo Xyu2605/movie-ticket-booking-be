@@ -29,7 +29,7 @@ CREATE TABLE users (
         FOREIGN KEY (role_id) REFERENCES roles(id),
     
     CONSTRAINT chk_auth_provider 
-        CHECK (auth_provider IN ('GOOGLE', 'FACEBOOK', 'LOCAL')),
+        CHECK (auth_provider IN ('GOOGLE', 'LOCAL')),
     
     -- Ràng buộc logic: LOCAL phải có password, OAuth không được có
     CONSTRAINT chk_local_has_password 

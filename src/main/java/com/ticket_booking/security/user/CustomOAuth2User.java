@@ -1,4 +1,4 @@
-package com.ticket_booking.utils.oauth2;
+package com.ticket_booking.security.user;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -9,8 +9,12 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.ticket_booking.dto.response.LoginResult;
 import com.ticket_booking.entity.User;
+import com.ticket_booking.security.user.CustomOAuth2User;
 import com.ticket_booking.security.user.CustomUserDetailsService;
+import com.ticket_booking.service.auth.AuthService;
+import com.ticket_booking.service.cookie.CookieService;
 import com.ticket_booking.service.jwt.JwtServiceImpl;
 
 import jakarta.servlet.ServletException;
@@ -26,7 +30,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     
     private final JwtServiceImpl jwtService;
     private final CustomUserDetailsService customUserDetailsService;
-    
+    private final CookieService cookieService;
+    private final AuthService authService;
+
     @Value("${spring.security.oauth2.redirect-url}")
     private String redirectUri;
     
@@ -46,17 +52,19 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         User user = principal.getUser();
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
         
-        String accessToken = jwtService.generateAccessToken(userDetails);
-        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        // String accessToken = jwtService.generateAccessToken(userDetails);
+        // String refreshToken = jwtService.generateRefreshToken(userDetails);
+        LoginResult result = authService.loginWithGoogle(principal);
+        cookieService.setRefreshTokenCookie(response, result.refreshToken());
 
         log.info("User {} logged in via OAuth2", user.getEmail());
 
         String targetUrl = UriComponentsBuilder
                             .fromUriString(redirectUri)
-                            .queryParam("accessToken", accessToken)
-                            .queryParam("refreshToken", refreshToken)
-                            .queryParam("user", user.getEmail())
-                            .queryParam("userId", user.getId())
+                            // .queryParam("accessToken", result.accessToken())
+                            // .queryParam("refreshToken", result.refreshToken())
+                            // .queryParam("user", user.getEmail())
+                            // .queryParam("userId", user.getId())
                             .build()
                             .toUriString();
         getRedirectStrategy().sendRedirect(request, response, targetUrl);

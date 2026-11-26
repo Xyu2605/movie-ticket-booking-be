@@ -1,30 +1,22 @@
 package com.ticket_booking.service.auth;
 
-import java.time.Duration;
-import java.util.UUID;
 
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ticket_booking.dto.UserDto;
-import com.ticket_booking.dto.UserSecurityDto;
 import com.ticket_booking.dto.request.LoginRequest;
-import com.ticket_booking.dto.response.LoginResponse;
 import com.ticket_booking.dto.response.LoginResult;
 import com.ticket_booking.entity.User;
-import com.ticket_booking.enums.AuthProvider;
 import com.ticket_booking.enums.ErrorCode;
 import com.ticket_booking.exception.ApiException;
 import com.ticket_booking.mapper.UserMapper;
 import com.ticket_booking.repository.UserRepository;
+import com.ticket_booking.security.user.CustomOAuth2User;
 import com.ticket_booking.security.user.CustomUserDetails;
 import com.ticket_booking.security.user.CustomUserDetailsService;
 import com.ticket_booking.service.cookie.CookieService;
@@ -93,5 +85,25 @@ public class AuthServiceImpl implements AuthService {
         // 8. Trả kết quả
         return new LoginResult(accessToken,refreshToken,userMapper.toDto(user));
     }
+
+    @Override
+    public LoginResult loginWithGoogle(OAuth2User oAuth2User){
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) oAuth2User;
+        User user = customOAuth2User.getUser();
+        if(user == null){
+            throw new ApiException(ErrorCode.INVALID_CREDENTIALS);
+        }
+
+        if(!user.isActive()){
+            throw new ApiException(ErrorCode.USER_BANNED);
+        }
+
+        CustomUserDetails userDetails = CustomUserDetails.buildUserDetails(user);
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        log.info("Google login success: userId={}", user.getId());
+        return new LoginResult(accessToken, refreshToken, userMapper.toDto(user));
+    }
+
 }
 
