@@ -245,6 +245,7 @@ public class UserServiceImpl implements UserService{
             }
         );
     }
+    
     // 2 email cos the den cung 1 luc @_@
     private UserDto createNewUser(CreateUserRequest request){
         log.info("Create new user for email: {}", request.email());

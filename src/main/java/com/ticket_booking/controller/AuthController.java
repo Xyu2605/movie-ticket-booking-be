@@ -6,10 +6,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ticket_booking.dto.request.CreateUserRequest;
 import com.ticket_booking.dto.request.LoginRequest;
 import com.ticket_booking.dto.response.ApiResponseFormat;
 import com.ticket_booking.dto.response.LoginResponse;
 import com.ticket_booking.dto.response.LoginResult;
+import com.ticket_booking.dto.response.RegisterResponse;
 import com.ticket_booking.enums.SuccessCode;
 import com.ticket_booking.service.auth.AuthService;
 import com.ticket_booking.service.cookie.CookieService;
@@ -39,5 +41,11 @@ public class AuthController {
         LoginResponse loginResponse = new LoginResponse(result.accessToken(), result.userDto());
 
         return responseFactory.response(SuccessCode.OK, loginResponse);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponseFormat<RegisterResponse>> register(@Valid @RequestBody CreateUserRequest request, HttpServletResponse response){
+        RegisterResponse registerResponse = authService.register(request, response);
+        return responseFactory.response(SuccessCode.OK, registerResponse);
     }
 }

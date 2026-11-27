@@ -18,7 +18,7 @@ public interface AuthService {
     LoginResult login(LoginRequest request, HttpServletRequest httpServletRequest);
     LoginResult loginWithGoogle(OAuth2User oauth2User);
     
-    // RegisterResponse register(CreateUserRequest request, HttpServletResponse response);
+    RegisterResponse register(CreateUserRequest request, HttpServletResponse response);
 
     // String getNewAccessToken(String refreshToken);
     

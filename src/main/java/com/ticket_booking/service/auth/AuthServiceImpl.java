@@ -5,12 +5,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ticket_booking.dto.UserDto;
+import com.ticket_booking.dto.request.CreateUserRequest;
 import com.ticket_booking.dto.request.LoginRequest;
 import com.ticket_booking.dto.response.LoginResult;
+import com.ticket_booking.dto.response.RegisterResponse;
 import com.ticket_booking.entity.User;
 import com.ticket_booking.enums.ErrorCode;
 import com.ticket_booking.exception.ApiException;
@@ -40,6 +44,9 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final UserSecurityService userSecurityService;
     private final UserMapper userMapper;
+    private final UserService userService;
+    private final CustomUserDetailsService userDetailsService;
+    private final CookieService cookieService;
 
     @Override
     @Transactional
@@ -81,7 +88,6 @@ public class AuthServiceImpl implements AuthService {
         // 7. JWT generate
         String accessToken =jwtService.generateAccessToken(userDetails);
         String refreshToken =jwtService.generateRefreshToken(userDetails);
-
         // 8. Trả kết quả
         return new LoginResult(accessToken,refreshToken,userMapper.toDto(user));
     }
@@ -105,5 +111,16 @@ public class AuthServiceImpl implements AuthService {
         return new LoginResult(accessToken, refreshToken, userMapper.toDto(user));
     }
 
+
+    @Override
+    public RegisterResponse register(CreateUserRequest request, HttpServletResponse response){
+        UserDto user =  userService.createUser(request);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.email());
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);    
+        cookieService.setRefreshTokenCookie(response, refreshToken);
+        return new RegisterResponse(accessToken, user);
+    }
 }
 

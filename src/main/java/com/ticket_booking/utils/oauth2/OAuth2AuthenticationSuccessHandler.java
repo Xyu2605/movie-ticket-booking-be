@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ticket_booking.dto.response.LoginResult;
 import com.ticket_booking.entity.User;
+import com.ticket_booking.exception.ApiException;
 import com.ticket_booking.security.user.CustomOAuth2User;
 import com.ticket_booking.security.user.CustomUserDetailsService;
 import com.ticket_booking.service.auth.AuthService;
@@ -48,18 +49,38 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             return;
         }
 
-        CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
-        User user = principal.getUser();
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
+        // CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
+        // User user = principal.getUser();
+        // UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
         
-        // String accessToken = jwtService.generateAccessToken(userDetails);
-        // String refreshToken = jwtService.generateRefreshToken(userDetails);
-        LoginResult result = authService.loginWithGoogle(principal);
-        cookieService.setRefreshTokenCookie(response, result.refreshToken());
+        // // String accessToken = jwtService.generateAccessToken(userDetails);
+        // // String refreshToken = jwtService.generateRefreshToken(userDetails);
+        // LoginResult result = authService.loginWithGoogle(principal);
+        // cookieService.setRefreshTokenCookie(response, result.refreshToken());
 
-        log.info("User {} logged in via OAuth2", user.getEmail());
+        // log.info("User {} logged in via OAuth2", user.getEmail());
 
-        String targetUrl = UriComponentsBuilder
+        // String targetUrl = UriComponentsBuilder
+        //                     .fromUriString(redirectUri)
+        //                     // .queryParam("accessToken", result.accessToken())
+        //                     // .queryParam("refreshToken", result.refreshToken())
+        //                     // .queryParam("user", user.getEmail())
+        //                     // .queryParam("userId", user.getId())
+        //                     .build()
+        //                     .toUriString();
+        // getRedirectStrategy().sendRedirect(request, response, targetUrl);
+
+        try{
+            CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
+            User user = principal.getUser();
+
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
+            // String accessToken = jwtService.generateAccessToken(userDetails);
+            // String refreshToken = jwtService.generateRefreshToken(userDetails);
+            LoginResult result = authService.loginWithGoogle(principal);
+            cookieService.setRefreshTokenCookie(response, result.refreshToken());
+            log.info("User {} logged in via OAuth2", user.getEmail());
+            String targetUrl = UriComponentsBuilder
                             .fromUriString(redirectUri)
                             // .queryParam("accessToken", result.accessToken())
                             // .queryParam("refreshToken", result.refreshToken())
@@ -67,6 +88,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                             // .queryParam("userId", user.getId())
                             .build()
                             .toUriString();
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+            log.debug("Redirecting to: {}", targetUrl);
+            getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        } catch(ApiException e){
+            log.warn("OAuth2 login failed: code={}, message={}", e.getErrorCode(), e.getMessage());
+        } catch (Exception e){
+            log.error("Unexpected OAuth2 error", e);
+        }
     }
 }
